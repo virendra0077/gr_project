@@ -8,14 +8,13 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
 
         statuses = [
-            {"code": "OPEN", "name": "Open"},
-            {"code": "IN_PROGRESS", "name": "In Progress"},
-            {"code": "RESOLVED", "name": "Resolved"},
-            {"code": "CLOSED", "name": "Closed"},
+            {"code": "open", "name": "Open"},
+            {"code": "wip", "name": "Work In Progress"},
+            {"code": "closed", "name": "Closed"},
         ]
 
         for status in statuses:
-            obj, created = SRStatus.objects.get_or_create(
+            obj, created = SRStatus.objects.update_or_create(
                 code=status["code"],
                 defaults={
                     "name": status["name"],
@@ -29,7 +28,9 @@ class Command(BaseCommand):
                 )
             else:
                 self.stdout.write(
-                    self.style.WARNING(f"SRStatus already exists: {obj.code}")
+                    self.style.WARNING(f"Updated SRStatus: {obj.code}")
                 )
 
-        self.stdout.write(self.style.SUCCESS("SRStatus master data loaded ✅"))
+        self.stdout.write(
+            self.style.SUCCESS("SRStatus master data loaded successfully ✅")
+        )

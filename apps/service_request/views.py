@@ -277,18 +277,94 @@ def assign_sr(request, sr_id):
 @login_required
 @require_POST
 def add_sr_comment(request, sr_id):
+    """
+    Add a comment to a Service Request.
+    Automatically moves SR from OPEN → WIP.
+    """
+
+    # Fetch SR
+
     sr = get_object_or_404(ServiceRequest, id=sr_id)
 
+    # Block commenting on CLOSED SR
+    if sr.status and sr.status_id == "3":
+        messages.error(request, "This Service Request is already closed.")
+        return redirect("view_sr", sr_id=sr.id)
+
+    # Get & validate comment
     comment_text = request.POST.get("comment", "").strip()
-
-    if comment_text:
-        SRComment.objects.create(
-            service_request=sr,
-            user=request.user,
-            comment=comment_text,
-        )
-        messages.success(request, "Comment added successfully.")
-    else:
+    if not comment_text:
         messages.error(request, "Comment cannot be empty.")
+        return redirect("view_sr", sr_id=sr.id)
 
+    # Create comment
+    SRComment.objects.create(
+        service_request=sr,
+        user=request.user,
+        comment=comment_text,
+    )
+
+    # Auto status change: open → wip
+    if sr.status and sr.status.code == "open":
+        wip_status = SRStatus.objects.filter(code="wip").first()
+        if wip_status:
+            sr.status = wip_status
+            sr.save(update_fields=["status", "updated_at"])
+
+    messages.success(request, "Comment added successfully.")
     return redirect("view_sr", sr_id=sr.id)
+
+@login_required(login_url="login")
+def close_sr(request, sr_id):
+    """
+    Close a Service Request and update all relevant fields
+    """
+    sr = get_object_or_404(ServiceRequest, id=sr_id)
+    
+    # Check if SR is already closed
+    if sr.status.code == 'closed':
+        messages.warning(request, f"SR {sr.sr_number} is already closed.")
+        return redirect('view_sr', sr_id=sr.id)
+    
+    if request.method == 'POST':
+        closing_comment = request.POST.get('closing_comment', '').strip()
+        
+        if not closing_comment:
+            messages.error(request, "Closing comment is required.")
+            return redirect('view_sr', sr_id=sr.id)
+        
+        try:
+            # Get the closed status
+            closed_status = SRStatus.objects.get(code='closed')
+            
+            # Update SR status
+            sr.status = closed_status
+            sr.closed_at = timezone.now()
+            sr.closed_by = request.user
+            sr.save()
+            
+            # Add closing comment
+            SRComment.objects.create(
+                service_request=sr,
+                user=request.user,
+                comment=f"[SR CLOSED] {closing_comment}",
+                is_internal=False
+            )
+            
+            messages.success(
+                request, 
+                f"SR {sr.sr_number} has been successfully closed."
+            )
+            
+        except SRStatus.DoesNotExist:
+            messages.error(
+                request, 
+                "Error: Closed status not found in database. Please contact administrator."
+            )
+        except Exception as e:
+            messages.error(request, f"Error closing SR: {str(e)}")
+        
+        return redirect('view_sr', sr_id=sr.id)
+    
+    # If GET request, redirect back to detail page
+    return redirect('view_sr', sr_id=sr.id)

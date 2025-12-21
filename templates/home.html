@@ -83,62 +83,45 @@
                 <div class="card-body d-flex justify-content-center align-items-center flex-column">
                     
                     <div class="pie-chart-container mb-4">
-                        <div class="pie-chart"></div>
+                        <div class="pie-chart" style="background: conic-gradient(
+                            #198754 0% {{ closed_pct }}%, 
+                            #ffc107 {{ closed_pct }}% {{ closed_pct|add:wip_pct }}%, 
+                            #dc3545 {{ closed_pct|add:wip_pct }}% 100%
+                        );"></div>
                     </div>
 
                     <div class="legend">
-                        <span class="d-block mb-1"><span class="legend-dot bg-success"></span> Closed (60%)</span>
-                        <span class="d-block mb-1"><span class="legend-dot bg-warning"></span> Work In Progress (25%)</span>
-                        <span class="d-block"><span class="legend-dot bg-danger"></span> Open (15%)</span>
+                        <span class="d-block mb-1"><span class="legend-dot bg-success"></span> Closed ({{ closed_pct }}%)</span>
+                        <span class="d-block mb-1"><span class="legend-dot bg-warning"></span> Work In Progress ({{ wip_pct }}%)</span>
+                        <span class="d-block"><span class="legend-dot bg-danger"></span> Open ({{ open_pct }}%)</span>
                     </div>
 
                 </div>
             </div>
         </div>
 
-<div class="col-lg-6 mb-4">
-    <div class="card shadow-lg h-100">
-        <div class="card-header bg-white fw-bold">Day-wise SR Creation (Last 7 Days)</div>
-        <div class="card-body d-flex flex-column justify-content-end">
-            
-            <div class="bar-chart-container">
-                <div class="bar-row">
-                    <div class="bar-item">
-                        <div class="bar bg-primary" style="height: 50%;"></div>
-                        <small>Mon</small>
-                    </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-lg h-100">
+                <div class="card-header bg-white fw-bold">Day-wise SR Creation (Last 7 Days)</div>
+                <div class="card-body d-flex flex-column justify-content-end">
                     
-                    <div class="bar-item">
-                        <div class="bar bg-primary" style="height: 90%;"></div>
-                        <small>Tue</small>
+                    <div class="bar-chart-container">
+                        <div class="bar-row">
+                            {% for day in bar_data %}
+                            <div class="bar-item">
+                                <div class="bar bg-primary" 
+                                     style="height: {% if day.height > 0 %}{{ day.height }}%{% else %}5%{% endif %};" 
+                                     title="{{ day.count }} SR{% if day.count != 1 %}s{% endif %}">
+                                </div>
+                                <small>{{ day.label }}</small>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                    
-                    <div class="bar-item">
-                        <div class="bar bg-primary" style="height: 60%;"></div>
-                        <small>Wed</small>
-                    </div>
-                    
-                    <div class="bar-item">
-                        <div class="bar bg-primary" style="height: 75%;"></div>
-                        <small>Thu</small>
-                    </div>
-                    
-                    <div class="bar-item">
-                        <div class="bar bg-primary" style="height: 100%;"></div>
-                        <small>Fri</small>
-                    </div>
-                    
-                    <div class="bar-item">
-                        <div class="bar bg-primary" style="height: 25%;"></div>
-                        <small>Sat</small>
-                    </div>
-                    
-
                 </div>
             </div>
         </div>
     </div>
-</div>
     
     <h2 class="mb-4">Quick Actions</h2>
     <hr>
@@ -196,37 +179,22 @@
         </div>
 
     </div>
+    
     <style>
-    /*
-     * 🚨 PIE CHART CSS - ADD THIS TO THE <style> BLOCK IN YOUR base.html FILE 🚨
-     * Using hex codes ensures maximum compatibility, bypassing potential issues 
-     * with CSS variables (rgb(var(--...))) not loading correctly.
-     */
-     
-    /* Pie Chart Container Styling - Must define size */
+    /* Pie Chart Container Styling */
     .pie-chart-container {
-        width: 200px; /* Define size */
+        width: 200px;
         height: 200px;
         margin: 15px auto;
         border-radius: 50%;
         box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.05);
     }
 
-    /* Pie Chart Generation using Conic Gradient */
+    /* Pie Chart */
     .pie-chart {
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        
-        /* 🎨 Guaranteed Working Conic Gradient using Hex Codes 🎨 */
-        background: conic-gradient(
-            /* Closed (60%) - Bootstrap Success Green */
-            #198754 0% 60%, 
-            /* WIP (25%) - Bootstrap Warning Yellow */
-            #ffc107 60% 85%, 
-            /* Open (15%) - Bootstrap Danger Red */
-            #dc3545 85% 100%
-        );
     }
     
     /* Legend Dots */
@@ -237,57 +205,62 @@
         border-radius: 50%;
         margin-right: 5px;
     }
-    /* Updated CSS for the Day-wise Bar Chart */
+    
+    /* Bar Chart Styles */
+    .bar-chart-container {
+        padding-top: 20px;
+        height: 250px;
+        border-bottom: 1px solid #ccc;
+        display: flex;
+        align-items: flex-end;
+        width: 100%;
+        position: relative;
+    }
 
-.bar-chart-container {
-    padding-top: 20px;
-    height: 250px; /* Define fixed height for the chart area */
-    border-bottom: 1px solid #ccc; /* X-axis line */
-    display: flex; /* Makes the overall chart container flexible */
-    align-items: flex-end; /* CRITICAL: Anchors all content to the bottom */
-    width: 100%;
-    position: relative;
-}
+    .bar-row {
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-end;
+        width: 100%;
+        height: 100%;
+    }
 
-.bar-row {
-    display: flex;
-    justify-content: space-around;
-    align-items: flex-end; /* CRITICAL: Anchors the bars to the bottom of the bar-row */
-    width: 100%;
-    height: 100%;
-}
+    .bar-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        width: 12%; 
+        height: 100%;
+        text-align: center;
+        font-size: 0.8rem;
+        color: #555;
+    }
 
-.bar-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end; /* CRITICAL: Pushes the label to the bottom */
-    width: 12%; 
-    height: 100%;
-    text-align: center;
-    font-size: 0.8rem;
-    color: #555;
-}
+    .bar {
+        width: 80%; 
+        border-radius: 4px 4px 0 0;
+        transition: height 0.5s ease-out; 
+        margin-bottom: 0;
+        min-height: 5px;
+    }
 
-.bar {
-    width: 80%; 
-    border-radius: 4px 4px 0 0;
-    transition: height 0.5s ease-out; 
-    /* Removed margin-bottom: 5px; to ensure it sits directly on the baseline */
-    margin-bottom: 0; 
-}
+    .bar:hover {
+        opacity: 0.8;
+        cursor: pointer;
+    }
 
-/* Optional: Add a subtle grid line */
-.bar-chart-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 100%;
-    background: repeating-linear-gradient(to top, #eee, #eee 1px, transparent 1px, transparent 50px);
-    opacity: 0.5;
-    pointer-events: none;
-}
-</style>
+    /* Grid lines */
+    .bar-chart-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        background: repeating-linear-gradient(to top, #eee, #eee 1px, transparent 1px, transparent 50px);
+        opacity: 0.5;
+        pointer-events: none;
+    }
+    </style>
 {% endblock %}

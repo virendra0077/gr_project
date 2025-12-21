@@ -36,9 +36,9 @@ def dashboard_view(request):
     # ---- BASIC COUNTS ----
     total_sr = ServiceRequest.objects.count()
 
-    open_sr = ServiceRequest.objects.filter(status__code="open").count()
-    wip_sr = ServiceRequest.objects.filter(status__code="wip").count()
-    closed_sr = ServiceRequest.objects.filter(status__code="closed").count()
+    open_sr = ServiceRequest.objects.filter(status__id="1").count()
+    wip_sr = ServiceRequest.objects.filter(status__id="2").count()
+    closed_sr = ServiceRequest.objects.filter(status__id="3").count()
 
     # ---- PIE CHART PERCENTAGES ----
     def pct(part, total):
@@ -63,12 +63,25 @@ def dashboard_view(request):
     sr_day_map = {str(x["day"]): x["count"] for x in sr_by_day}
 
     bar_data = []
+    max_count = 0
+    
+    # First pass: collect data and find max
     for i in range(6, -1, -1):
         day = today - timedelta(days=i)
+        count = sr_day_map.get(str(day), 0)
+        max_count = max(max_count, count)
         bar_data.append({
             "label": day.strftime("%a"),
-            "count": sr_day_map.get(str(day), 0)
+            "count": count
         })
+    
+    # Second pass: calculate heights as percentage of max
+    if max_count > 0:
+        for item in bar_data:
+            item["height"] = int((item["count"] / max_count) * 100)
+    else:
+        for item in bar_data:
+            item["height"] = 0
 
     context = {
         "total_sr": total_sr,
@@ -79,6 +92,7 @@ def dashboard_view(request):
         "wip_pct": wip_pct,
         "closed_pct": closed_pct,
         "bar_data": bar_data,
+        "max_count": max_count,
     }
 
     return render(request, "home.html", context)

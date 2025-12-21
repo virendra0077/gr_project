@@ -121,11 +121,11 @@
                     <div class="mb-3">
                         <label class="text-muted small">Current Status</label>
                         <p class="fw-bold">
-                            {% if sr.status.code == 'OPEN' %}
+                            {% if sr.status.code == 'open' %}
                                 <span class="badge bg-primary">Open</span>
-                            {% elif sr.status.code == 'WIP' %}
-                                <span class="badge bg-warning text-dark">In Progress</span>
-                            {% elif sr.status.code == 'CLOSED' %}
+                            {% elif sr.status.code == 'wip' %}
+                                <span class="badge bg-warning text-dark"> Work In Progress</span>
+                            {% elif sr.status.code == 'closed' %}
                                 <span class="badge bg-secondary">Closed</span>
                             {% endif %}
                         </p>
