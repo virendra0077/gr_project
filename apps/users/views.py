@@ -29,7 +29,6 @@ def login_view(request):
 
     return render(request, "users/login.html")
 
-
 @login_required(login_url="login")
 def dashboard_view(request):
 
@@ -47,6 +46,13 @@ def dashboard_view(request):
     open_pct = pct(open_sr, total_sr)
     wip_pct = pct(wip_sr, total_sr)
     closed_pct = pct(closed_sr, total_sr)
+
+    # ---- PARENTED VS UNPARENTED ----
+    parented_sr = ServiceRequest.objects.filter(category='parented').count()
+    unparented_sr = ServiceRequest.objects.filter(category='unparented').count()
+    
+    parented_pct = pct(parented_sr, total_sr)
+    unparented_pct = pct(unparented_sr, total_sr)
 
     # ---- LAST 7 DAYS SR CREATION ----
     today = timezone.now().date()
@@ -93,6 +99,10 @@ def dashboard_view(request):
         "closed_pct": closed_pct,
         "bar_data": bar_data,
         "max_count": max_count,
+        "parented_sr": parented_sr,
+        "unparented_sr": unparented_sr,
+        "parented_pct": parented_pct,
+        "unparented_pct": unparented_pct,
     }
 
     return render(request, "home.html", context)
