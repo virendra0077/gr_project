@@ -314,57 +314,31 @@ def add_sr_comment(request, sr_id):
     messages.success(request, "Comment added successfully.")
     return redirect("view_sr", sr_id=sr.id)
 
-@login_required(login_url="login")
+@login_required
+@require_POST
 def close_sr(request, sr_id):
     """
-    Close a Service Request and update all relevant fields
+    Close a Service Request (staff only)
     """
+    if not request.user.is_staff:
+        messages.error(request, "You don't have permission to close service requests.")
+        return redirect('view_sr', sr_id=sr_id)
+    
     sr = get_object_or_404(ServiceRequest, id=sr_id)
     
     # Check if SR is already closed
-    if sr.status.code == 'closed':
-        messages.warning(request, f"SR {sr.sr_number} is already closed.")
-        return redirect('view_sr', sr_id=sr.id)
+    if sr.status and sr.status.code == "closed":
+        messages.warning(request, "This Service Request is already closed.")
+        return redirect('view_sr', sr_id=sr_id)
     
-    if request.method == 'POST':
-        closing_comment = request.POST.get('closing_comment', '').strip()
-        
-        if not closing_comment:
-            messages.error(request, "Closing comment is required.")
-            return redirect('view_sr', sr_id=sr.id)
-        
-        try:
-            # Get the closed status
-            closed_status = SRStatus.objects.get(code='closed')
-            
-            # Update SR status
-            sr.status = closed_status
-            sr.closed_at = timezone.now()
-            sr.closed_by = request.user
-            sr.save()
-            
-            # Add closing comment
-            SRComment.objects.create(
-                service_request=sr,
-                user=request.user,
-                comment=f"[SR CLOSED] {closing_comment}",
-                is_internal=False
-            )
-            
-            messages.success(
-                request, 
-                f"SR {sr.sr_number} has been successfully closed."
-            )
-            
-        except SRStatus.DoesNotExist:
-            messages.error(
-                request, 
-                "Error: Closed status not found in database. Please contact administrator."
-            )
-        except Exception as e:
-            messages.error(request, f"Error closing SR: {str(e)}")
-        
-        return redirect('view_sr', sr_id=sr.id)
+    # Get closed status
+    closed_status = get_object_or_404(SRStatus, code="closed", is_active=True)
     
-    # If GET request, redirect back to detail page
-    return redirect('view_sr', sr_id=sr.id)
+    # Update SR status
+    sr.status = closed_status
+    sr.closed_by = request.user
+    sr.closed_at = timezone.now()
+    sr.save(update_fields=["status", "closed_by", "closed_at", "updated_at"])
+    
+    messages.success(request, f"Service Request {sr.sr_number} has been closed successfully.")
+    return redirect('view_sr', sr_id=sr_id)

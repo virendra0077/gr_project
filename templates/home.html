@@ -4,15 +4,15 @@
 {% block navbar_title %}Dashboard{% endblock %}
 
 {% block content %}
-    <div class="p-4 p-md-5 mb-4 rounded-3 text-white" style="background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);">
+    <div class="p-2 p-md-3 mb-4 rounded-3 text-white" style="background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);">
         <div class="container-fluid py-2">
-            <h1 class="display-5 fw-bold">Welcome back, {{ request.user.username }}! 👋</h1>
-            <p class="fs-4">
+            <h3 class="display-12 fw-bold">Welcome back, {{ request.user.username }}! 👋</h3>
+            {% comment %} <p class="fs-4">
                 Your central hub for managing and tracking customer Service Requests (SRs).
             </p>
             <p class="mb-0">
                 Use the navigation menu on the left to quickly access key features.
-            </p>
+            </p> {% endcomment %}
         </div>
     </div>
     
