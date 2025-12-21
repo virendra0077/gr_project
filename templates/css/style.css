@@ -1,0 +1,153 @@
+.sidebar-header {
+    background: #111827; /* Dark background */
+}
+.sidebar {
+    /* ... */
+    background: var(--dark-bg) !important; /* Also dark */
+    /* ... */
+}
+
+/* Custom CSS for a Clean, White/Light Theme */
+
+:root {
+    --primary: #1d4ed8; /* Blue accent color */
+    --primary-light: #3b82f6; 
+    --sidebar-accent: #1f2937; /* Dark Grey for logo/active state */
+    --body-bg: #f3f4f6; /* Overall light background */
+    --sidebar-bg: #ffffff; /* White sidebar background */
+    --sidebar-border: #e5e7eb; /* Light border */
+    --sidebar-text: #374151; /* Dark text for links */
+}
+
+body {
+    background: var(--body-bg);
+    font-family: 'Inter', sans-serif, system-ui;
+    color: var(--sidebar-text);
+}
+
+/* -------------------- Sidebar Styles (White Theme) -------------------- */
+.sidebar {
+    width: 260px; 
+    min-height: 100vh;
+    position: sticky;
+    top: 0;
+    /* 🚨 FIX: Set background to white */
+    background: var(--sidebar-bg) !important;
+    border-right: 1px solid var(--sidebar-border); 
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05); /* Subtle shadow on the right */
+    transition: width 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    /* FIX: Ensure header is also light and border is subtle */
+    background: var(--sidebar-bg);
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--sidebar-border) !important;
+}
+
+/* Logo Circle (Dark Accent on Light Background) */
+.logo-circle {
+    width: 75px; 
+    height: 75px;
+    border-radius: 50%;
+    border: 3px solid var(--primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-weight: 700;
+    font-size: 1.2rem;
+    /* FIX: Use a dark accent color for the logo container */
+    background: var(--sidebar-accent) !important; 
+    color: #ffffff !important;
+    box-shadow: 0 0 0 5px rgba(29, 78, 216, 0.1);
+    overflow: hidden;
+}
+
+/* Logo Image inside the circle */
+.logo-circle img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Sidebar links (Dark text on light background) */
+.sidebar-link {
+    padding: 12px 18px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 1rem;
+    /* FIX: Dark text color */
+    color: var(--sidebar-text) !important; 
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.sidebar-link:hover,
+.sidebar-link:focus {
+    /* Subtle light gray hover */
+    background-color: var(--sidebar-border); 
+    color: var(--sidebar-accent) !important;
+    text-decoration: none;
+}
+
+.sidebar-link.active {
+    /* Primary accent color for active link */
+    background-color: var(--primary);
+    color: #fff !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Footer text */
+.sidebar small.text-secondary {
+    color: #9ca3af !important;
+}
+
+/* -------------------- Main Content & Cards -------------------- */
+
+.main-content {
+    background: var(--body-bg);
+    min-height: calc(100vh - 60px);
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+/* Custom CSS for the Static Pie Chart */
+
+/* Colors matching Bootstrap utility classes (These are needed for the gradient to work) */
+.bg-success { --bs-success-rgb: 25, 135, 84; }
+.bg-warning { --bs-warning-rgb: 255, 193, 7; }
+.bg-danger  { --bs-danger-rgb: 220, 53, 69; }
+
+/* 1. Pie Chart Container Styling - Must define size */
+.pie-chart-container {
+    width: 200px; 
+    height: 200px;
+    margin: 15px auto;
+    border-radius: 50%;
+    box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+/* 2. Pie Chart Generation using Conic Gradient - CRITICAL PART */
+.pie-chart {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    
+    /* 🚨 CONIC GRADIENT DEFINITION - Verify these color names and percentages 🚨 */
+    background: conic-gradient(
+        #198754 0% {{ closed_pct }}%,
+        #ffc107 {{ closed_pct }}% {{ closed_pct|add:wip_pct }}%,
+        #dc3545 {{ closed_pct|add:wip_pct }}% 100%
+    );
+}

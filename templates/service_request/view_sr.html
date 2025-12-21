@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}SR Details - {{ sr.sr_number }}{% endblock %}
+{% block navbar_title %}Service Request Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Service Request Details</h3>
+        <a href="{% url 'list_sr' %}" class="btn btn-secondary">
+         <i class="fas fa-arrow-left"></i> Back to List
+          </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt"></i> SR Number: {{ sr.sr_number }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="text-muted small">SR Type</label>
+                            <p class="fw-bold">
+                                <span class="badge bg-info">{{ sr.sr_type.name }}</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small">SR Nature</label>
+                            <p class="fw-bold">
+                                {% if sr.sr_nature.code == 'complaint' %}
+                                    <span class="badge bg-danger">{{ sr.sr_nature.name }}</span>
+                                {% elif sr.sr_nature.code == 'request' %}
+                                    <span class="badge bg-primary">{{ sr.sr_nature.name }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ sr.sr_nature.name }}</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="text-muted small">Category</label>
+                            <p class="fw-bold">
+                                {% if sr.category == 'parented' %}
+                                    <span class="badge bg-success">Parented SR</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Unparented SR</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small">Account Number</label>
+                            <p class="fw-bold">
+                                {% if sr.account_number %}
+                                    {{ sr.account_number }}
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="mb-3">
+                        <label class="text-muted small">Subject</label>
+                        <p class="fw-bold">{{ sr.subject }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="text-muted small">Description</label>
+                        <p class="text-justify">{{ sr.description }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user"></i> Customer Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-md-4">
+                            <label class="text-muted small">Email</label>
+                            <p class="fw-bold">
+                                <i class="fas fa-envelope"></i> {{ sr.email }}
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="text-muted small">Phone</label>
+                            <p class="fw-bold">
+                                <i class="fas fa-phone"></i> {{ sr.phone }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="text-muted small">Address</label>
+                        <p>{{ sr.address }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle"></i> SR Status
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Current Status</label>
+                        <p class="fw-bold">
+                            {% if sr.status.code == 'OPEN' %}
+                                <span class="badge bg-primary">Open</span>
+                            {% elif sr.status.code == 'WIP' %}
+                                <span class="badge bg-warning text-dark">In Progress</span>
+                            {% elif sr.status.code == 'CLOSED' %}
+                                <span class="badge bg-secondary">Closed</span>
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <hr>
+
+                    <div class="mb-2">
+                        <label class="text-muted small">Created At</label>
+                        <p class="fw-bold">
+                            <i class="fas fa-calendar-alt"></i> {{ sr.created_at|date:"d M Y" }}<br>
+                            <i class="fas fa-clock"></i> {{ sr.created_at|date:"h:i A" }}
+                        </p>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="text-muted small">Created By</label>
+                        <p class="fw-bold">
+                            {% if sr.created_by %}
+                                <i class="fas fa-user-tie"></i> {{ sr.created_by.username }}
+                            {% else %}
+                                <span class="text-muted">System</span>
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    {% if sr.status == 'closed' and sr.closed_at %}
+                    <hr>
+                    <div class="mb-2">
+                        <label class="text-muted small">Closed At</label>
+                        <p class="fw-bold">
+                            <i class="fas fa-calendar-times"></i> {{ sr.closed_at|date:"d M Y" }}<br>
+                            <i class="fas fa-clock"></i> {{ sr.closed_at|date:"h:i A" }}
+                        </p>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="text-muted small">Closed By</label>
+                        <p class="fw-bold">
+                            {% if sr.closed_by %}
+                                <i class="fas fa-user-check"></i> {{ sr.closed_by.username }}
+                            {% else %}
+                                <span class="text-muted">Unknown</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            </div>
+    </div>
+   
+<div class="card shadow-sm mt-3">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">
+            <i class="fas fa-comment-dots me-1"></i> Comments
+        </h5>
+    </div>
+
+    <div class="card-body">
+
+        <!-- All Comments -->
+        {% if comments %}
+            {% for comment in comments %}
+                <div class="border rounded p-3 mb-3 bg-light">
+                    <div class="d-flex justify-content-between mb-1">
+                        <strong>
+                            <i class="fas fa-user-circle me-1"></i>
+                            {{ comment.user.username }}
+                        </strong>
+                        <small class="text-muted">
+                            {{ comment.created_at|date:"d M Y, h:i A" }}
+                        </small>
+                    </div>
+                    <p class="mb-0">{{ comment.comment }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted">No comments yet.</p>
+        {% endif %}
+
+        <hr>
+
+        <!-- Single Comment Input -->
+        <form method="POST" action="{% url 'add_sr_comment' sr.id %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <textarea
+                    name="comment"
+                    class="form-control"
+                    rows="3"
+                    placeholder="Write a comment..."
+                    required></textarea>
+            </div>
+
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane me-1"></i> Add Comment
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+
+
+</div>
+
+{% endblock %}

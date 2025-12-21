@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Bank Grievance{% endblock %}
+{% block navbar_title %}Dashboard{% endblock %}
+
+{% block content %}
+    <div class="p-4 p-md-5 mb-4 rounded-3 text-white" style="background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);">
+        <div class="container-fluid py-2">
+            <h1 class="display-5 fw-bold">Welcome back, {{ request.user.username }}! 👋</h1>
+            <p class="fs-4">
+                Your central hub for managing and tracking customer Service Requests (SRs).
+            </p>
+            <p class="mb-0">
+                Use the navigation menu on the left to quickly access key features.
+            </p>
+        </div>
+    </div>
+    
+    <h2 class="mb-3">SR Summary</h2>
+    <div class="row mb-5">
+        
+        <div class="col-sm-6 col-lg-3 mb-3">
+            <div class="card shadow-sm h-100 bg-white border-bottom border-4 border-secondary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-uppercase fw-bold text-secondary mb-1">Total SRs</p>
+                            <h3 class="fw-bolder mb-0">{{ total_sr }}</h3>
+                        </div>
+                        <i class="fas fa-ticket-alt fa-2x text-secondary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3 mb-3">
+            <div class="card shadow-sm h-100 bg-white border-bottom border-4 border-danger">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-uppercase fw-bold text-danger mb-1">Open SRs</p>
+                            <h3 class="fw-bolder mb-0">{{ open_sr }}</h3>
+                        </div>
+                        <i class="fas fa-exclamation-circle fa-2x text-danger"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3 mb-3">
+            <div class="card shadow-sm h-100 bg-white border-bottom border-4 border-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-uppercase fw-bold text-warning mb-1">Work In Progress</p>
+                            <h3 class="fw-bolder mb-0">{{ wip_sr }}</h3>
+                        </div>
+                        <i class="fas fa-hourglass-half fa-2x text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3 mb-3">
+            <div class="card shadow-sm h-100 bg-white border-bottom border-4 border-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-uppercase fw-bold text-success mb-1">Closed SRs</p>
+                            <h3 class="fw-bolder mb-0">{{ closed_sr }}</h3>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-5">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-lg h-100">
+                <div class="card-header bg-white fw-bold">SR Status Distribution</div>
+                <div class="card-body d-flex justify-content-center align-items-center flex-column">
+                    
+                    <div class="pie-chart-container mb-4">
+                        <div class="pie-chart"></div>
+                    </div>
+
+                    <div class="legend">
+                        <span class="d-block mb-1"><span class="legend-dot bg-success"></span> Closed (60%)</span>
+                        <span class="d-block mb-1"><span class="legend-dot bg-warning"></span> Work In Progress (25%)</span>
+                        <span class="d-block"><span class="legend-dot bg-danger"></span> Open (15%)</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+<div class="col-lg-6 mb-4">
+    <div class="card shadow-lg h-100">
+        <div class="card-header bg-white fw-bold">Day-wise SR Creation (Last 7 Days)</div>
+        <div class="card-body d-flex flex-column justify-content-end">
+            
+            <div class="bar-chart-container">
+                <div class="bar-row">
+                    <div class="bar-item">
+                        <div class="bar bg-primary" style="height: 50%;"></div>
+                        <small>Mon</small>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar bg-primary" style="height: 90%;"></div>
+                        <small>Tue</small>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar bg-primary" style="height: 60%;"></div>
+                        <small>Wed</small>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar bg-primary" style="height: 75%;"></div>
+                        <small>Thu</small>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar bg-primary" style="height: 100%;"></div>
+                        <small>Fri</small>
+                    </div>
+                    
+                    <div class="bar-item">
+                        <div class="bar bg-primary" style="height: 25%;"></div>
+                        <small>Sat</small>
+                    </div>
+                    
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+    <h2 class="mb-4">Quick Actions</h2>
+    <hr>
+    
+    <div class="row mt-4">
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-lg border-start border-5 border-primary">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="fs-2 text-primary me-3">📝</span>
+                        <h5 class="card-title mb-0 fw-bold">Create New SR</h5>
+                    </div>
+                    <p class="card-text text-muted">
+                        Submit a new service request to officially log a customer grievance.
+                    </p>
+                    <a href="{% url 'create_sr_form' %}" class="btn btn-primary mt-auto">
+                        <i class="fas fa-plus-circle me-1"></i> Submit Request
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-lg border-start border-5 border-success">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="fs-2 text-success me-3">🔍</span>
+                        <h5 class="card-title mb-0 fw-bold">View Existing SRs</h5>
+                    </div>
+                    <p class="card-text text-muted">
+                        Track the status and manage all existing grievance service requests.
+                    </p>
+                    <a href="{% url 'list_sr' %}" class="btn btn-outline-success mt-auto">
+                        <i class="fas fa-list-alt me-1"></i> Go to Tracking
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-lg border-start border-5 border-warning">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="fs-2 text-warning me-3">📊</span>
+                        <h5 class="card-title mb-0 fw-bold">SR Analytics</h5>
+                    </div>
+                    <p class="card-text text-muted">
+                        View reports on pending, resolved, and average resolution time.
+                    </p>
+                    <a href="#" class="btn btn-outline-warning mt-auto disabled">
+                        View Reports (Coming Soon)
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <style>
+    /*
+     * 🚨 PIE CHART CSS - ADD THIS TO THE <style> BLOCK IN YOUR base.html FILE 🚨
+     * Using hex codes ensures maximum compatibility, bypassing potential issues 
+     * with CSS variables (rgb(var(--...))) not loading correctly.
+     */
+     
+    /* Pie Chart Container Styling - Must define size */
+    .pie-chart-container {
+        width: 200px; /* Define size */
+        height: 200px;
+        margin: 15px auto;
+        border-radius: 50%;
+        box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Pie Chart Generation using Conic Gradient */
+    .pie-chart {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        
+        /* 🎨 Guaranteed Working Conic Gradient using Hex Codes 🎨 */
+        background: conic-gradient(
+            /* Closed (60%) - Bootstrap Success Green */
+            #198754 0% 60%, 
+            /* WIP (25%) - Bootstrap Warning Yellow */
+            #ffc107 60% 85%, 
+            /* Open (15%) - Bootstrap Danger Red */
+            #dc3545 85% 100%
+        );
+    }
+    
+    /* Legend Dots */
+    .legend-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 5px;
+    }
+    /* Updated CSS for the Day-wise Bar Chart */
+
+.bar-chart-container {
+    padding-top: 20px;
+    height: 250px; /* Define fixed height for the chart area */
+    border-bottom: 1px solid #ccc; /* X-axis line */
+    display: flex; /* Makes the overall chart container flexible */
+    align-items: flex-end; /* CRITICAL: Anchors all content to the bottom */
+    width: 100%;
+    position: relative;
+}
+
+.bar-row {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end; /* CRITICAL: Anchors the bars to the bottom of the bar-row */
+    width: 100%;
+    height: 100%;
+}
+
+.bar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end; /* CRITICAL: Pushes the label to the bottom */
+    width: 12%; 
+    height: 100%;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #555;
+}
+
+.bar {
+    width: 80%; 
+    border-radius: 4px 4px 0 0;
+    transition: height 0.5s ease-out; 
+    /* Removed margin-bottom: 5px; to ensure it sits directly on the baseline */
+    margin-bottom: 0; 
+}
+
+/* Optional: Add a subtle grid line */
+.bar-chart-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: repeating-linear-gradient(to top, #eee, #eee 1px, transparent 1px, transparent 50px);
+    opacity: 0.5;
+    pointer-events: none;
+}
+</style>
+{% endblock %}

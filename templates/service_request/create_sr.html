@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Create SR - Bank Grievance{% endblock %}
+{% block navbar_title %}Create Service Request{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h3 class="mb-3">Create Service Request (SR)</h3>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} py-2">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <!-- IMPORTANT: action added -->
+            <form method="POST" action="{% url 'create_sr_submit' %}">
+                {% csrf_token %}
+
+                <!-- SR Category -->
+                <div class="mb-3">
+                    <label class="form-label d-block">SR Category</label>
+
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input"
+                               type="radio"
+                               name="category"
+                               id="parented_sr"
+                               value="parented"
+                               {% if form_data.category == 'parented' %}checked{% endif %}>
+                        <label class="form-check-label" for="parented_sr">
+                            Parented SR
+                        </label>
+                    </div>
+
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input"
+                               type="radio"
+                               name="category"
+                               id="unparented_sr"
+                               value="unparented"
+                               {% if form_data.category == 'unparented' %}checked{% endif %}>
+                        <label class="form-check-label" for="unparented_sr">
+                            Unparented SR
+                        </label>
+                    </div>
+
+                    {% if errors.category %}
+                        <div class="text-danger small">{{ errors.category }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Account Number -->
+                <div class="mb-3" id="account-number-group">
+                    <label class="form-label">Account Number</label>
+                    <input type="text"
+                           class="form-control"
+                           name="account_number"
+                           value="{{ form_data.account_number|default_if_none:'' }}"
+                           oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                    {% if errors.account_number %}
+                        <div class="text-danger small">{{ errors.account_number }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- SR Nature & SR Type -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">SR Nature</label>
+                        <select class="form-select" name="sr_nature" required>
+                            <option value="">-- Select Nature --</option>
+                            {% for nature in sr_natures %}
+                                <option value="{{ nature.id }}"
+                                    {% if form_data.sr_nature == nature.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ nature.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if errors.sr_nature %}
+                            <div class="text-danger small">{{ errors.sr_nature }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">SR Type</label>
+                        <select class="form-select" name="sr_type" required>
+                            <option value="">-- Select Type --</option>
+                            {% for type in sr_types %}
+                                <option value="{{ type.id }}"
+                                    {% if form_data.sr_type == type.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ type.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if errors.sr_type %}
+                            <div class="text-danger small">{{ errors.sr_type }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Subject -->
+                <div class="mb-3">
+                    <label class="form-label">Subject</label>
+                    <input type="text"
+                           class="form-control"
+                           name="subject"
+                           value="{{ form_data.subject|default_if_none:'' }}"
+                           required>
+                    {% if errors.subject %}
+                        <div class="text-danger small">{{ errors.subject }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control"
+                              name="description"
+                              rows="4"
+                              required>{{ form_data.description|default_if_none:'' }}</textarea>
+                    {% if errors.description %}
+                        <div class="text-danger small">{{ errors.description }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Contact -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email"
+                               class="form-control"
+                               name="email"
+                               value="{{ form_data.email|default_if_none:'' }}"
+                               required>
+                        {% if errors.email %}
+                            <div class="text-danger small">{{ errors.email }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="text"
+                               class="form-control"
+                               name="phone"
+                               value="{{ form_data.phone|default_if_none:'' }}"
+                               maxlength="10"
+                               required
+                               oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10);">
+                        {% if errors.phone %}
+                            <div class="text-danger small">{{ errors.phone }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div class="mb-3">
+                    <label class="form-label">Address</label>
+                    <textarea class="form-control"
+                              name="address"
+                              rows="2"
+                              required>{{ form_data.address|default_if_none:'' }}</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Submit SR
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleAccountField() {
+    const parented = document.getElementById('parented_sr').checked;
+    const group = document.getElementById('account-number-group');
+    const input = group.querySelector('input');
+
+    group.style.display = parented ? 'block' : 'none';
+    input.required = parented;
+}
+
+document.addEventListener('DOMContentLoaded', toggleAccountField);
+document.getElementById('parented_sr').addEventListener('change', toggleAccountField);
+document.getElementById('unparented_sr').addEventListener('change', toggleAccountField);
+</script>
+{% endblock %}
