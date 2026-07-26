@@ -1,35 +1,41 @@
 # Use Python 3.11 slim image
 FROM python:3.11-slim
 
-# Set environment variables
+# Prevent Python from writing .pyc files
 ENV PYTHONDONTWRITEBYTECODE=1
+
+# Send logs directly to terminal
 ENV PYTHONUNBUFFERED=1
 
-# Set work directory
+# Set working directory
 WORKDIR /app
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
+    libpq-dev \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY requirements.txt /app/
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+# Copy requirements first (better Docker caching)
+COPY requirements.txt .
 
-# Copy project files
-COPY . /app/
+# Install Python packages
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
-# Create staticfiles directory
+# Copy project
+COPY . .
+
+# Create static directory
 RUN mkdir -p /app/staticfiles
 
-# Collect static files
-RUN python manage.py collectstatic --noinput || true
-
-# Expose port
+# Expose application port
 EXPOSE 8000
 
-# Run migrations and start server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Start Gunicorn
+COPY entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

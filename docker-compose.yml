@@ -1,26 +1,39 @@
+version: "3.9"
+
 services:
   web:
     build: .
-    ports:
-      - "8000:8000"
+    container_name: django_app
+
+    command: >
+      gunicorn grievance.wsgi:application
+      --bind 0.0.0.0:8000
+      --workers 1
+
     env_file:
       - .env
+
+    ports:
+      - "8000:8000"
+
     depends_on:
-      - db
-    volumes:
-      - .:/app
-    command: python manage.py runserver 0.0.0.0:8000
+      db:
+        condition: service_started
+
+    restart: unless-stopped
 
   db:
     image: postgres:15
-    environment:
-      POSTGRES_DB: grievance_portal
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Virendra@26
+
+    container_name: postgres_db
+
+    env_file:
+      - .env
+
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+
+    restart: unless-stopped
 
 volumes:
   postgres_data:
